@@ -13,7 +13,7 @@ export const LANGUAGES: { value: Language; label: string }[] = [
 
 export const TRANSLATIONS = {
   "Overview": { "zh-Hans": "概述", "zh-Hant": "概述", "fa": "نمای کلی", "ru": "Обзор" },
-  "Groups": { "zh-Hans": "组", "zh-Hant": "組", "fa": "گروه‌ها", "ru": "Группы" },
+  "Groups": { "zh-Hans": "代理组", "zh-Hant": "代理組", "fa": "گروه‌ها", "ru": "Группы" },
   "Connections": { "zh-Hans": "连接", "zh-Hant": "連接", "fa": "اتصال‌ها", "ru": "Подключения" },
   "Logs": { "zh-Hans": "日志", "zh-Hant": "日誌", "fa": "گزارش", "ru": "Журнал" },
   "Tools": { "zh-Hans": "工具", "zh-Hant": "工具", "fa": "ابزارها", "ru": "Инструменты" },
