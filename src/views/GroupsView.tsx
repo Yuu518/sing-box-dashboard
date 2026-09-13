@@ -70,15 +70,33 @@ function GroupCard(props: { group: Group }) {
   };
 
   return (
-    <div className={cx(styles.groupCard, expanded && styles.expanded)}>
+    <div
+      className={cx(styles.groupCard, expanded && styles.expanded)}
+      onClick={(event) => {
+        const target = event.target;
+        if (
+          !(target instanceof Element) ||
+          !event.currentTarget.contains(target) ||
+          target.closest(`button, .${styles.groupDots}`)
+        ) {
+          return;
+        }
+        toggleExpand();
+      }}
+    >
       <Card
         title={
-          <>
+          <button
+            type="button"
+            className={styles.groupTitle}
+            aria-expanded={expanded}
+            onClick={toggleExpand}
+          >
             {group.tag}
             <span style={{ marginLeft: 8, color: "var(--text-faint)", fontWeight: 500 }}>
               {proxyDisplayType(group.type)}
             </span>
-          </>
+          </button>
         }
         actions={
           <>
@@ -111,10 +129,18 @@ function GroupCard(props: { group: Group }) {
             {group.items.map((item) => {
               const tone = item.urlTestDelay > 0 ? urlTestDelayTone(item.urlTestDelay) : "";
               return (
-                <span
+                <button
+                  type="button"
                   key={item.tag}
                   className={cx(styles.groupDot, styles[tone], item.tag === selected && styles.selected)}
                   title={`${item.tag}${item.urlTestDelay > 0 ? ` (${item.urlTestDelay}ms)` : ""}`}
+                  aria-label={item.tag}
+                  aria-pressed={item.tag === selected}
+                  disabled={!group.selectable}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    selectItem(item);
+                  }}
                 />
               );
             })}

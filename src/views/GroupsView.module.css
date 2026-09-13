@@ -4,6 +4,7 @@
 
 .group-card {
   margin-bottom: var(--space-14);
+  cursor: pointer;
 }
 
 .group-card :global(.card-header) {
@@ -17,6 +18,16 @@
   position: sticky;
   top: 0;
   z-index: var(--z-sticky-header);
+}
+
+.group-title {
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+  background: none;
+  border: 0;
 }
 
 .group-items {
@@ -92,14 +103,22 @@
   flex-wrap: wrap;
   gap: var(--space-4);
   margin-top: 0;
+  cursor: default;
 }
 
 .group-dot {
   position: relative;
   width: 11px;
   height: 11px;
+  padding: 0;
+  cursor: pointer;
   background: var(--neutral-soft);
+  border: 0;
   border-radius: var(--radius-xs);
+}
+
+.group-dot:disabled {
+  cursor: default;
 }
 
 .group-dot.good {
