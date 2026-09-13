@@ -13,6 +13,12 @@ import {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("URL test preferences", () => {
+  it("keeps IPv6 testing off for old preferences and invalid stored flags", () => {
+    for (const value of [undefined, null, "true", 1, false]) {
+      expect(normalizeURLTestPreferences({ ipv6Test: value }).ipv6Test).toBe(false);
+    }
+    expect(normalizeURLTestPreferences({ ipv6Test: true }).ipv6Test).toBe(true);
+  });
   it("fills missing and invalid values with concrete defaults", () => {
     expect(normalizeURLTestPreferences(null)).toEqual(DEFAULT_URL_TEST_PREFERENCES);
     expect(normalizeURLTestPreferences({
@@ -25,7 +31,7 @@ describe("URL test preferences", () => {
   it("preserves custom values and repairs invalid threshold ordering", () => {
     expect(normalizeURLTestPreferences({
       url: " https://example.com/ping ", timeoutMs: 5000, yellowThresholdMs: 200, redThresholdMs: 600,
-    })).toEqual({ url: "https://example.com/ping", timeoutMs: 5000, yellowThresholdMs: 200, redThresholdMs: 600 });
+    })).toEqual({ url: "https://example.com/ping", timeoutMs: 5000, yellowThresholdMs: 200, redThresholdMs: 600, ipv6Test: false });
     for (const yellowThresholdMs of [1500, 2000]) {
       const normalized = normalizeURLTestPreferences({ yellowThresholdMs, redThresholdMs: 1500 });
       expect(normalized.yellowThresholdMs).toBe(800);
@@ -46,7 +52,7 @@ describe("URL test preferences", () => {
     vi.stubGlobal("window", target);
     const listener = vi.fn();
     target.addEventListener(URL_TEST_PREFERENCES_EVENT, listener);
-    const preferences = { ...DEFAULT_URL_TEST_PREFERENCES, timeoutMs: 3000, yellowThresholdMs: 100, redThresholdMs: 300 };
+    const preferences = { ...DEFAULT_URL_TEST_PREFERENCES, timeoutMs: 3000, yellowThresholdMs: 100, redThresholdMs: 300, ipv6Test: true };
     saveURLTestPreferences(preferences);
     expect(loadURLTestPreferences()).toEqual(preferences);
     expect(listener).toHaveBeenCalledOnce();

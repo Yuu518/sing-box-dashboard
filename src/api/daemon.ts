@@ -4,6 +4,7 @@ import { Code, ConnectError, createClient } from "@connectrpc/connect";
 import { createGrpcWebTransport } from "@connectrpc/connect-web";
 
 import { MIN_API_VERSION } from "../app/capabilities";
+import { loadURLTestPreferences } from "../app/urlTestPreferences";
 import {
   Connection,
   ConnectionEventType,
@@ -418,7 +419,7 @@ export class DaemonApi {
   }
 
   async urlTest(outboundTag: string): Promise<void> {
-    await this.client.uRLTest({ outboundTag });
+    await this.client.uRLTest({ outboundTag, ipv6Test: loadURLTestPreferences().ipv6Test });
   }
 
   async selectOutbound(groupTag: string, outboundTag: string): Promise<void> {

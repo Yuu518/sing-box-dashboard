@@ -31,7 +31,7 @@ import { LanguageSelect, useI18n } from "../app/i18n";
 import { Icon } from "../components/Icon";
 import { PageHeader } from "../components/PageHeader";
 import { ReachabilityIndicator, useServerReachability } from "../components/ReachabilityIndicator";
-import { Button, Dialog, Field, IconButton, MenuItem, MenuLink, NavRow, SecretInput, Select, Spinner, ThemeMenu, ThemeSelect, useContextMenu } from "../components/ui";
+import { Button, Dialog, Field, IconButton, MenuItem, MenuLink, NavRow, SecretInput, Select, Spinner, Switch, ThemeMenu, ThemeSelect, useContextMenu } from "../components/ui";
 import {
   DEFAULT_DARK_THEME_NAME,
   DEFAULT_LIGHT_THEME_NAME,
@@ -741,6 +741,7 @@ export function URLTestPreferencesView() {
   const { t } = useI18n();
   const host = useDesktopHost();
   const [initial] = useState(loadURLTestPreferences);
+  const [ipv6Test, setIPv6Test] = useState(initial.ipv6Test);
   const [url, setUrl] = useState(initial.url);
   const [numbers, setNumbers] = useState({
     timeoutMs: String(initial.timeoutMs),
@@ -772,6 +773,7 @@ export function URLTestPreferencesView() {
         onSubmit={(event) => {
           event.preventDefault();
           const next = {
+            ipv6Test,
             url: url.trim() || DEFAULT_URL_TEST_PREFERENCES.url,
             timeoutMs: Number(numbers.timeoutMs || DEFAULT_URL_TEST_PREFERENCES.timeoutMs),
             redThresholdMs: Number(numbers.redThresholdMs || DEFAULT_URL_TEST_PREFERENCES.redThresholdMs),
@@ -826,6 +828,17 @@ export function URLTestPreferencesView() {
             />
           </Field>
         ))}
+        <div className="settings-row">
+          <span className="settings-row-label">{t("IPv6 test")}</span>
+          <Switch
+            label={t("IPv6 test")}
+            value={ipv6Test}
+            onChange={(value) => {
+              setIPv6Test(value);
+              clearFeedback();
+            }}
+          />
+        </div>
         {error !== "" && <div className={styles.fieldError} role="alert">{error}</div>}
         <div>
           <Button type="submit" variant="primary">{t("Save")}</Button>

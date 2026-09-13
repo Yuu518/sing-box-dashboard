@@ -13,6 +13,7 @@ export const LANGUAGES: { value: Language; label: string }[] = [
 
 export const TRANSLATIONS = {
   "Speed test": { "zh-Hans": "测速", "zh-Hant": "測速", "fa": "تست سرعت", "ru": "Проверка скорости" },
+  "IPv6 test": { "zh-Hans": "IPv6 测试", "zh-Hant": "IPv6 測試", "fa": "تست IPv6", "ru": "Проверка IPv6" },
   "Node test URL": { "zh-Hans": "节点测速地址", "zh-Hant": "節點測速位址", "fa": "نشانی تست گره", "ru": "URL проверки узла" },
   "Test timeout (ms)": { "zh-Hans": "测速超时（毫秒）", "zh-Hant": "測速逾時（毫秒）", "fa": "مهلت تست (میلی‌ثانیه)", "ru": "Тайм-аут проверки (мс)" },
   "Red threshold (ms)": { "zh-Hans": "红色阈值（毫秒）", "zh-Hant": "紅色閾值（毫秒）", "fa": "آستانه قرمز (میلی‌ثانیه)", "ru": "Красный порог (мс)" },

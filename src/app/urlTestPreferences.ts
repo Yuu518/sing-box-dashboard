@@ -5,6 +5,7 @@ export const URL_TEST_PREFERENCES_EVENT = "url-test-preferences-change";
 export const MAX_URL_TEST_MS = 2_147_483_647;
 
 export interface URLTestPreferences {
+  ipv6Test: boolean;
   url: string;
   timeoutMs: number;
   yellowThresholdMs: number;
@@ -12,6 +13,7 @@ export interface URLTestPreferences {
 }
 
 export const DEFAULT_URL_TEST_PREFERENCES: Readonly<URLTestPreferences> = {
+  ipv6Test: false,
   url: "https://www.gstatic.com/generate_204",
   timeoutMs: 15000,
   yellowThresholdMs: 800,
@@ -46,6 +48,7 @@ export function normalizeURLTestPreferences(value: unknown): URLTestPreferences 
     redThresholdMs = defaults.redThresholdMs;
   }
   return {
+    ipv6Test: stored.ipv6Test === true,
     url: typeof stored.url === "string" && isValidURLTestUrl(stored.url.trim()) ? stored.url.trim() : defaults.url,
     timeoutMs: milliseconds("timeoutMs"),
     yellowThresholdMs,

@@ -171,9 +171,15 @@ export function proxyDisplayType(type: string): string {
   return PROXY_DISPLAY_TYPES[type] ?? type;
 }
 
-export function proxyDisplayDescription(item: { type: string; udp?: boolean; xudp?: boolean }): string {
-  const type = proxyDisplayType(item.type);
-  return item.udp ? `${type} / ${item.xudp ? "xudp" : "udp"}` : type;
+export function proxyDisplayDescription(
+  item: { type: string; udp?: boolean; xudp?: boolean; ipv6?: boolean },
+  ipv6Test = false,
+): string {
+  return [
+    proxyDisplayType(item.type),
+    item.udp ? (item.xudp ? "xudp" : "udp") : "",
+    ipv6Test && item.ipv6 ? "IPv6" : "",
+  ].filter(Boolean).join(" / ");
 }
 
 export function natMappingDescription(value: number): string {

@@ -123,6 +123,7 @@ function GroupCard(props: { group: Group }) {
                 item={item}
                 selected={item.tag === selected}
                 tone={urlTestDelayTone(item.urlTestDelay, preferences)}
+                ipv6Test={preferences.ipv6Test}
                 onSelect={() => selectItem(item)}
               />
             ))}
@@ -154,7 +155,7 @@ function GroupCard(props: { group: Group }) {
   );
 }
 
-function GroupItemCard(props: { item: GroupItem; selected: boolean; tone: DelayTone; onSelect: () => void }) {
+function GroupItemCard(props: { item: GroupItem; selected: boolean; tone: DelayTone; ipv6Test: boolean; onSelect: () => void }) {
   const api = useApi();
   const { t } = useI18n();
   const item = props.item;
@@ -188,7 +189,7 @@ function GroupItemCard(props: { item: GroupItem; selected: boolean; tone: DelayT
         />
         <span className={styles.itemTag}>{item.tag}</span>
         <span className={styles.itemMeta}>
-          <span>{proxyDisplayDescription(item)}</span>
+          <span>{proxyDisplayDescription(item, props.ipv6Test)}</span>
           {item.urlTestDelay > 0 && (
             <button
               type="button"
