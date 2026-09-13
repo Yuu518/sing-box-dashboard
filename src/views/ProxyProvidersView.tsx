@@ -177,7 +177,7 @@ function ProviderNode({ item }: { item: GroupItem }) {
           disabled={testing}
           onClick={run}
         >
-          {testing ? <Spinner /> : item.urlTestDelay > 0 ? `${item.urlTestDelay}ms` : <Icon name="bolt" size={14} />}
+          {testing ? <Spinner /> : item.urlTestDelay > 0 ? item.urlTestDelay : <Icon name="bolt" size={12} />}
         </button>
       </span>
     </div>

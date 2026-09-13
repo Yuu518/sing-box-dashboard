@@ -256,21 +256,19 @@ function GroupItemCard(props: { item: GroupItem; selected: boolean; tone: DelayT
         <span className={styles.itemTag}>{item.tag}</span>
         <span className={styles.itemMeta}>
           <span>{proxyDisplayDescription(item, props.ipv6Test)}</span>
-          {item.urlTestDelay > 0 && (
-            <button
-              type="button"
-              className={cx(styles.delayText, styles[props.tone])}
-              title={`${t("URL test")}: ${item.tag}`}
-              aria-label={`${t("URL test")}: ${item.tag}`}
-              disabled={testing}
-              onClick={(event) => {
-                event.stopPropagation();
-                runURLTest();
-              }}
-            >
-              {testing ? <Spinner /> : `${item.urlTestDelay}ms`}
-            </button>
-          )}
+          <button
+            type="button"
+            className={cx(styles.delayText, styles[props.tone])}
+            title={`${t("URL test")}: ${item.tag}`}
+            aria-label={`${t("URL test")}: ${item.tag}`}
+            disabled={testing}
+            onClick={(event) => {
+              event.stopPropagation();
+              runURLTest();
+            }}
+          >
+            {testing ? <Spinner /> : item.urlTestDelay > 0 ? item.urlTestDelay : <Icon name="bolt" size={12} />}
+          </button>
         </span>
       </div>
       {menu.element}
