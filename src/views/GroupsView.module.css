@@ -20,9 +20,16 @@
   z-index: var(--z-sticky-header);
 }
 
-.group-tabs {
-  max-width: 100%;
+.group-toolbar {
+  display: flex;
+  gap: var(--space-8);
+  align-items: center;
   margin-bottom: var(--space-14);
+}
+
+.group-tabs {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .group-tabs :global(button.active) {

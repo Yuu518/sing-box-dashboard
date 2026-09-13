@@ -12,6 +12,9 @@ export const LANGUAGES: { value: Language; label: string }[] = [
 ];
 
 export const TRANSLATIONS = {
+  "Update all subscriptions": { "zh-Hans": "更新所有订阅", "zh-Hant": "更新所有訂閱", "fa": "به‌روزرسانی همه اشتراک‌ها", "ru": "Обновить все подписки" },
+  "{count} nodes ({tested} tested)": { "zh-Hans": "{count} 个节点 ({tested} 已测试)", "zh-Hant": "{count} 個節點 ({tested} 已測試)", "fa": "{count} گره ({tested} تست‌شده)", "ru": "{count} узлов (проверено: {tested})" },
+  "Updated {time}": { "zh-Hans": "更新于 {time}", "zh-Hant": "更新於 {time}", "fa": "به‌روزرسانی {time}", "ru": "Обновлено {time}" },
   "Proxies": { "zh-Hans": "代理", "zh-Hant": "代理", "fa": "پروکسی‌ها", "ru": "Прокси" },
   "Proxy providers": { "zh-Hans": "代理提供商", "zh-Hant": "代理提供商", "fa": "ارائه‌دهندگان پروکسی", "ru": "Провайдеры прокси" },
   "No proxy provider data": { "zh-Hans": "暂无代理提供商数据", "zh-Hant": "暫無代理提供商資料", "fa": "داده‌ای برای ارائه‌دهندگان پروکسی موجود نیست", "ru": "Нет данных о провайдерах прокси" },

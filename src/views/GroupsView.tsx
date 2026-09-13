@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { proxyDisplayDescription, proxyDisplayType, urlTestDelayTone, type DelayTone } from "../api/format";
-import { useStream } from "../api/stream";
+import { describeError, useStream } from "../api/stream";
 import { useSupportsCapability } from "../app/capabilities";
 import { useApi } from "../app/context";
 import { showError } from "../app/errorStore";
@@ -13,7 +13,7 @@ import { PageHeader } from "../components/PageHeader";
 import { StreamStates } from "../components/StreamBanner";
 import { Badge, Card, IconButton, MenuItem, Spinner, useContextMenu } from "../components/ui";
 import type { Group, GroupItem } from "../gen/daemon/started_service_pb";
-import { ProxyProvidersView } from "./ProxyProvidersView";
+import { ProxyProvidersRefreshButton, ProxyProvidersTabLabel, ProxyProvidersView } from "./ProxyProvidersView";
 import styles from "./GroupsView.module.css";
 import { cx } from "../lib/cx";
 
@@ -24,28 +24,51 @@ export function GroupsView() {
   const [activeTab, setActiveTab] = useState<"proxies" | "providers">("proxies");
   const supportsProviders = useSupportsCapability("proxyProviders");
   const showingProviders = supportsProviders && activeTab === "providers";
+  const [updatingProviders, setUpdatingProviders] = useState(false);
+  const updatingProvidersRef = useRef(false);
+
+  const updateProviders = async () => {
+    if (updatingProvidersRef.current) return;
+    const providers = api.proxyProviders.getSnapshot().data.providers.filter((provider) => provider.updatable);
+    if (providers.length === 0) return;
+    updatingProvidersRef.current = true;
+    setUpdatingProviders(true);
+    try {
+      const results = await Promise.allSettled(providers.map((provider) => api.updateProxyProvider(provider.tag)));
+      const errors = results.flatMap((result, index) => result.status === "rejected"
+        ? [`${providers[index].tag}: ${describeError(result.reason).message}`]
+        : []);
+      if (errors.length > 0) showError(new Error(errors.join("\n")));
+    } finally {
+      updatingProvidersRef.current = false;
+      setUpdatingProviders(false);
+    }
+  };
 
   return (
     <div className="page">
-      <PageHeader title={t("Groups")} />
+      <PageHeader title={t("Proxies")} />
       {supportsProviders && (
-        <div className={cx("segmented", styles.groupTabs)} role="group" aria-label={t("Groups")}>
-          <button
-            type="button"
-            className={!showingProviders ? "active" : ""}
-            aria-pressed={!showingProviders}
-            onClick={() => setActiveTab("proxies")}
-          >
-            {t("Proxies")}{groups.data.loaded ? ` (${groups.data.groups.length})` : ""}
-          </button>
-          <button
-            type="button"
-            className={showingProviders ? "active" : ""}
-            aria-pressed={showingProviders}
-            onClick={() => setActiveTab("providers")}
-          >
-            {t("Proxy providers")}
-          </button>
+        <div className={styles.groupToolbar}>
+          <div className={cx("segmented", styles.groupTabs)} role="group" aria-label={t("Groups")}>
+            <button
+              type="button"
+              className={!showingProviders ? "active" : ""}
+              aria-pressed={!showingProviders}
+              onClick={() => setActiveTab("proxies")}
+            >
+              {t("Proxies")}{groups.data.loaded ? ` (${groups.data.groups.length})` : ""}
+            </button>
+            <button
+              type="button"
+              className={showingProviders ? "active" : ""}
+              aria-pressed={showingProviders}
+              onClick={() => setActiveTab("providers")}
+            >
+              <ProxyProvidersTabLabel />
+            </button>
+          </div>
+          {showingProviders && <ProxyProvidersRefreshButton updating={updatingProviders} onUpdate={updateProviders} />}
         </div>
       )}
       <div hidden={showingProviders}>
@@ -61,7 +84,7 @@ export function GroupsView() {
         ))}
       </div>
       {showingProviders && (
-        <ProxyProvidersView />
+        <ProxyProvidersView updating={updatingProviders} />
       )}
     </div>
   );
