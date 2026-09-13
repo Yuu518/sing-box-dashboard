@@ -45,6 +45,7 @@ function GroupCard(props: { group: Group }) {
   const [testing, setTesting] = useState(false);
   const [expanded, setExpandOverride] = usePendingValue(group.isExpand);
   const [selected, setPendingSelection] = usePendingValue(group.selected);
+  const selectedDelay = group.items.find((item) => item.tag === selected)?.urlTestDelay ?? 0;
 
   const toggleExpand = () => {
     const next = !expanded;
@@ -103,9 +104,16 @@ function GroupCard(props: { group: Group }) {
         actions={
           <>
             <Badge>{group.items.length}</Badge>
-            <IconButton title={t("URL test")} onClick={runURLTest} disabled={testing}>
-              {testing ? <Spinner /> : <Icon name="speed" />}
-            </IconButton>
+            <button
+              type="button"
+              className={cx(styles.delayText, styles.headerDelay, styles[urlTestDelayTone(selectedDelay, preferences)])}
+              title={`${t("URL test")}: ${group.tag}${selectedDelay > 0 ? ` (${selectedDelay}ms)` : ""}`}
+              aria-label={`${t("URL test")}: ${group.tag}`}
+              onClick={runURLTest}
+              disabled={testing}
+            >
+              {testing ? <Spinner /> : selectedDelay > 0 ? selectedDelay : <Icon name="bolt" size={14} />}
+            </button>
             <IconButton
               title={expanded ? t("Collapse") : t("Expand")}
               onClick={toggleExpand}
@@ -115,6 +123,11 @@ function GroupCard(props: { group: Group }) {
           </>
         }
       >
+        {selected !== "" && (
+          <div className={styles.currentNode} title={selected}>
+            {selected}
+          </div>
+        )}
         {expanded ? (
           <div className={styles.groupItems}>
             {group.items.map((item) => (

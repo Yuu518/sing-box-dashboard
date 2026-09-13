@@ -25,6 +25,7 @@ import {
   isValidURLTestUrl,
   loadURLTestPreferences,
   saveURLTestPreferences,
+  type URLTestPreferences,
 } from "../app/urlTestPreferences";
 import { ServiceStatus_Type } from "../gen/daemon/started_service_pb";
 import { LanguageSelect, useI18n } from "../app/i18n";
@@ -748,17 +749,57 @@ export function URLTestPreferencesView() {
     redThresholdMs: String(initial.redThresholdMs),
     yellowThresholdMs: String(initial.yellowThresholdMs),
   });
-  const [error, setError] = useState("");
-  const [saved, setSaved] = useState(false);
+  const [urlError, setUrlError] = useState("");
+  const [numberError, setNumberError] = useState("");
   const numberFields = [
     { key: "timeoutMs", label: t("Test timeout (ms)") },
     { key: "redThresholdMs", label: t("Red threshold (ms)") },
     { key: "yellowThresholdMs", label: t("Yellow threshold (ms)") },
   ] as const;
 
-  const clearFeedback = () => {
-    setError("");
-    setSaved(false);
+  const persist = (patch: Partial<URLTestPreferences>) => {
+    try {
+      saveURLTestPreferences({ ...loadURLTestPreferences(), ...patch });
+    } catch (error) {
+      showError(error);
+    }
+  };
+
+  const updateUrl = (value: string, finished = false) => {
+    const next = finished ? value.trim() || DEFAULT_URL_TEST_PREFERENCES.url : value;
+    setUrl(next);
+    if (isValidURLTestUrl(next.trim())) {
+      setUrlError("");
+      persist({ url: next.trim() });
+    } else {
+      setUrlError(finished ? t("Enter a valid HTTP or HTTPS test URL.") : "");
+    }
+  };
+
+  const updateNumber = (key: keyof typeof numbers, value: string, validationMessage: string) => {
+    const next = { ...numbers, [key]: value };
+    setNumbers(next);
+    setNumberError(validationMessage);
+    if (validationMessage !== "" || value === "") {
+      return;
+    }
+    if (key === "timeoutMs") {
+      persist({ timeoutMs: Number(value) });
+      return;
+    }
+    if (next.yellowThresholdMs === "" || next.redThresholdMs === "") {
+      return;
+    }
+    const yellowThresholdMs = Number(next.yellowThresholdMs);
+    const redThresholdMs = Number(next.redThresholdMs);
+    if (![yellowThresholdMs, redThresholdMs].every((number) => Number.isInteger(number) && number > 0 && number <= MAX_URL_TEST_MS)) {
+      return;
+    }
+    if (yellowThresholdMs >= redThresholdMs) {
+      setNumberError(t("The red threshold must be greater than the yellow threshold."));
+      return;
+    }
+    persist({ yellowThresholdMs, redThresholdMs });
   };
 
   return (
@@ -768,43 +809,14 @@ export function URLTestPreferencesView() {
         back={host !== null ? "settings/app" : "settings/preferences"}
         backLabel={host !== null ? t("App") : t("Preferences")}
       />
-      <form
-        className="card settings-stack"
-        onSubmit={(event) => {
-          event.preventDefault();
-          const next = {
-            ipv6Test,
-            url: url.trim() || DEFAULT_URL_TEST_PREFERENCES.url,
-            timeoutMs: Number(numbers.timeoutMs || DEFAULT_URL_TEST_PREFERENCES.timeoutMs),
-            redThresholdMs: Number(numbers.redThresholdMs || DEFAULT_URL_TEST_PREFERENCES.redThresholdMs),
-            yellowThresholdMs: Number(numbers.yellowThresholdMs || DEFAULT_URL_TEST_PREFERENCES.yellowThresholdMs),
-          };
-          if (!isValidURLTestUrl(next.url)) {
-            setError(t("Enter a valid HTTP or HTTPS test URL."));
-            return;
-          }
-          if (next.yellowThresholdMs >= next.redThresholdMs) {
-            setError(t("The red threshold must be greater than the yellow threshold."));
-            return;
-          }
-          try {
-            saveURLTestPreferences(next);
-            setUrl(next.url);
-            setNumbers({ timeoutMs: String(next.timeoutMs), redThresholdMs: String(next.redThresholdMs), yellowThresholdMs: String(next.yellowThresholdMs) });
-            setError("");
-            setSaved(true);
-          } catch (error) {
-            showError(error);
-          }
-        }}
-      >
+      <div className="card settings-stack">
         <Field label={t("Node test URL")}>
           <input
             className="input"
             type="url"
             value={url}
-            onChange={(event) => { setUrl(event.target.value); clearFeedback(); }}
-            onBlur={() => { if (url.trim() === "") setUrl(DEFAULT_URL_TEST_PREFERENCES.url); }}
+            onChange={(event) => updateUrl(event.target.value)}
+            onBlur={(event) => updateUrl(event.target.value, true)}
           />
         </Field>
         {numberFields.map(({ key, label }) => (
@@ -817,12 +829,11 @@ export function URLTestPreferencesView() {
               step={1}
               value={numbers[key]}
               onChange={(event) => {
-                setNumbers({ ...numbers, [key]: event.target.value });
-                clearFeedback();
+                updateNumber(key, event.target.value, event.target.validationMessage);
               }}
               onBlur={() => {
                 if (numbers[key] === "") {
-                  setNumbers({ ...numbers, [key]: String(DEFAULT_URL_TEST_PREFERENCES[key]) });
+                  updateNumber(key, String(DEFAULT_URL_TEST_PREFERENCES[key]), "");
                 }
               }}
             />
@@ -835,16 +846,13 @@ export function URLTestPreferencesView() {
             value={ipv6Test}
             onChange={(value) => {
               setIPv6Test(value);
-              clearFeedback();
+              persist({ ipv6Test: value });
             }}
           />
         </div>
-        {error !== "" && <div className={styles.fieldError} role="alert">{error}</div>}
-        <div>
-          <Button type="submit" variant="primary">{t("Save")}</Button>
-        </div>
-        {saved && <div role="status">{t("Saved")}</div>}
-      </form>
+        {urlError !== "" && <div className={styles.fieldError} role="alert">{urlError}</div>}
+        {numberError !== "" && <div className={styles.fieldError} role="alert">{numberError}</div>}
+      </div>
     </div>
   );
 }
