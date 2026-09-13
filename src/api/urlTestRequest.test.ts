@@ -17,13 +17,13 @@ it("uses the latest saved IPv6 setting for each node or group test", async () =>
   const request = vi.spyOn(api.client, "uRLTest").mockResolvedValue(create(EmptySchema));
 
   await api.urlTest("node");
-  expect(request).toHaveBeenLastCalledWith({ outboundTag: "node", ipv6Test: false });
-  stored = JSON.stringify({ ipv6Test: true });
+  expect(request).toHaveBeenLastCalledWith({ outboundTag: "node", ipv6Test: false, url: "https://www.gstatic.com/generate_204", timeoutMs: 15000 });
+  stored = JSON.stringify({ ipv6Test: true, url: "https://example.com/check", timeoutMs: 2500 });
   await api.urlTest("group");
-  expect(request).toHaveBeenLastCalledWith({ outboundTag: "group", ipv6Test: true });
+  expect(request).toHaveBeenLastCalledWith({ outboundTag: "group", ipv6Test: true, url: "https://example.com/check", timeoutMs: 2500 });
   stored = JSON.stringify({ ipv6Test: false });
   await api.urlTest("node");
-  expect(request).toHaveBeenLastCalledWith({ outboundTag: "node", ipv6Test: false });
+  expect(request).toHaveBeenLastCalledWith({ outboundTag: "node", ipv6Test: false, url: "https://www.gstatic.com/generate_204", timeoutMs: 15000 });
 });
 
 it("encodes the IPv6 request flag and defaults legacy requests to disabled", () => {

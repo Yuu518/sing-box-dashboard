@@ -11,8 +11,9 @@ import { useURLTestPreferences } from "../app/useURLTestPreferences";
 import { Icon } from "../components/Icon";
 import { PageHeader } from "../components/PageHeader";
 import { StreamStates } from "../components/StreamBanner";
-import { Badge, Card, EmptyState, IconButton, MenuItem, Spinner, useContextMenu } from "../components/ui";
+import { Badge, Card, IconButton, MenuItem, Spinner, useContextMenu } from "../components/ui";
 import type { Group, GroupItem } from "../gen/daemon/started_service_pb";
+import { ProxyProvidersView } from "./ProxyProvidersView";
 import styles from "./GroupsView.module.css";
 import { cx } from "../lib/cx";
 
@@ -60,7 +61,7 @@ export function GroupsView() {
         ))}
       </div>
       {showingProviders && (
-        <EmptyState icon="folder">{t("No proxy provider data")}</EmptyState>
+        <ProxyProvidersView />
       )}
     </div>
   );

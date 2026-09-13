@@ -1,0 +1,35 @@
+.providers {
+  display: grid;
+  gap: var(--space-14);
+}
+
+.nodes {
+  margin-top: var(--space-14);
+}
+
+.nodes summary {
+  cursor: pointer;
+}
+
+.node {
+  display: flex;
+  gap: var(--space-14);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-10) 0;
+}
+
+.description {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}

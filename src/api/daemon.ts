@@ -11,6 +11,7 @@ import {
   DeprecatedWarning,
   Group,
   GroupItem,
+  type ProxyProvider,
   LogLevel,
   ServiceStatus,
   ServiceStatus_Type,
@@ -45,6 +46,11 @@ export interface StatusData {
 
 export interface GroupsData {
   groups: Group[];
+  loaded: boolean;
+}
+
+export interface ProxyProvidersData {
+  providers: ProxyProvider[];
   loaded: boolean;
 }
 
@@ -121,6 +127,7 @@ export class DaemonApi {
   readonly serviceStatus: StreamStore<ServiceStatusData>;
   readonly status: StreamStore<StatusData>;
   readonly groups: StreamStore<GroupsData>;
+  readonly proxyProviders: StreamStore<ProxyProvidersData>;
   readonly clashMode: StreamStore<ClashModeData>;
   readonly logs: StreamStore<LogsData>;
   readonly connections: StreamStore<ConnectionsData>;
@@ -185,6 +192,20 @@ export class DaemonApi {
           update(() => ({ groups: message.group, loaded: true }));
         }
       },
+    );
+
+    this.proxyProviders = new StreamStore<ProxyProvidersData>(
+      () => ({ providers: [], loaded: false }),
+      async ({ signal, update }) => {
+        const info = await this.serverInfo();
+        if (!info.proxyProvidersSupported) {
+          throw new ConnectError("proxy providers are not supported by this server", Code.Unimplemented);
+        }
+        for await (const message of this.client.subscribeProxyProviders({}, { signal })) {
+          update(() => ({ providers: message.providers, loaded: true }));
+        }
+      },
+      true,
     );
 
     this.clashMode = new StreamStore<ClashModeData>(
@@ -397,6 +418,7 @@ export class DaemonApi {
     this.serviceStatus.retryNow();
     this.status.retryNow();
     this.groups.retryNow();
+    this.proxyProviders.retryNow();
     this.clashMode.retryNow();
     this.logs.retryNow();
     this.connections.retryNow();
@@ -411,6 +433,7 @@ export class DaemonApi {
     this.serviceStatus.reconnectNow();
     this.status.reconnectNow();
     this.groups.reconnectNow();
+    this.proxyProviders.reconnectNow();
     this.clashMode.reconnectNow();
     this.logs.reconnectNow();
     this.connections.reconnectNow();
@@ -420,7 +443,17 @@ export class DaemonApi {
   }
 
   async urlTest(outboundTag: string): Promise<void> {
-    await this.client.uRLTest({ outboundTag, ipv6Test: loadURLTestPreferences().ipv6Test });
+    const { ipv6Test, url, timeoutMs } = loadURLTestPreferences();
+    await this.client.uRLTest({ outboundTag, ipv6Test, url, timeoutMs });
+  }
+
+  async updateProxyProvider(tag: string): Promise<void> {
+    await this.client.updateProxyProvider({ tag });
+  }
+
+  async healthCheckProxyProvider(tag: string): Promise<void> {
+    const { ipv6Test, url, timeoutMs } = loadURLTestPreferences();
+    await this.client.healthCheckProxyProvider({ tag, ipv6Test, url, timeoutMs });
   }
 
   async selectOutbound(groupTag: string, outboundTag: string): Promise<void> {
