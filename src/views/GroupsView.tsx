@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { proxyDisplayType, urlTestDelayTone, type DelayTone } from "../api/format";
+import { proxyDisplayDescription, proxyDisplayType, urlTestDelayTone, type DelayTone } from "../api/format";
 import { useStream } from "../api/stream";
 import { useApi } from "../app/context";
 import { showError } from "../app/errorStore";
@@ -188,7 +188,7 @@ function GroupItemCard(props: { item: GroupItem; selected: boolean; tone: DelayT
         />
         <span className={styles.itemTag}>{item.tag}</span>
         <span className={styles.itemMeta}>
-          <span>{proxyDisplayType(item.type)}</span>
+          <span>{proxyDisplayDescription(item)}</span>
           {item.urlTestDelay > 0 && (
             <button
               type="button"

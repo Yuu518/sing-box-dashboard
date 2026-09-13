@@ -148,7 +148,7 @@ const PROXY_DISPLAY_TYPES: Record<string, string> = {
   dns: "DNS",
   socks: "SOCKS",
   http: "HTTP",
-  shadowsocks: "Shadowsocks",
+  shadowsocks: "ss",
   vmess: "VMess",
   trojan: "Trojan",
   naive: "Naive",
@@ -169,6 +169,11 @@ const PROXY_DISPLAY_TYPES: Record<string, string> = {
 
 export function proxyDisplayType(type: string): string {
   return PROXY_DISPLAY_TYPES[type] ?? type;
+}
+
+export function proxyDisplayDescription(item: { type: string; udp?: boolean; xudp?: boolean }): string {
+  const type = proxyDisplayType(item.type);
+  return item.udp ? `${type} / ${item.xudp ? "xudp" : "udp"}` : type;
 }
 
 export function natMappingDescription(value: number): string {

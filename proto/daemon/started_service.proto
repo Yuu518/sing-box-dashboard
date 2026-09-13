@@ -126,6 +126,8 @@ message GroupItem {
   string type = 2;
   int64 urlTestTime = 3;
   int32 urlTestDelay = 4;
+  bool udp = 5;
+  bool xudp = 6;
 }
 
 message URLTestRequest {
