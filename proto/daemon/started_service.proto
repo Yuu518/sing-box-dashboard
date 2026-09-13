@@ -55,6 +55,8 @@ service StartedService {
 message Version {
   string version = 1;
   int32 apiVersion = 2;
+  // Advertise provider-list support explicitly; older servers default to false.
+  bool proxyProvidersSupported = 3;
 }
 
 message ServiceStatus {

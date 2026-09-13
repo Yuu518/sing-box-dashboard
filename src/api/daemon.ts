@@ -107,6 +107,7 @@ export interface OpenVPNData {
 export interface ServerInfo {
   version: string;
   apiVersion: number;
+  proxyProvidersSupported: boolean;
 }
 
 const SUBSCRIPTION_INTERVAL = 1_000_000_000n;
@@ -449,7 +450,11 @@ export class DaemonApi {
   async serverInfo(): Promise<ServerInfo> {
     if (!this.versionCache) {
       const response = await this.client.getVersion({});
-      this.versionCache = { version: response.version, apiVersion: response.apiVersion };
+      this.versionCache = {
+        version: response.version,
+        apiVersion: response.apiVersion,
+        proxyProvidersSupported: response.proxyProvidersSupported,
+      };
     }
     return this.versionCache;
   }

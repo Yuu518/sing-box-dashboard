@@ -12,6 +12,9 @@ export const LANGUAGES: { value: Language; label: string }[] = [
 ];
 
 export const TRANSLATIONS = {
+  "Proxies": { "zh-Hans": "代理", "zh-Hant": "代理", "fa": "پروکسی‌ها", "ru": "Прокси" },
+  "Proxy providers": { "zh-Hans": "代理提供商", "zh-Hant": "代理提供商", "fa": "ارائه‌دهندگان پروکسی", "ru": "Провайдеры прокси" },
+  "No proxy provider data": { "zh-Hans": "暂无代理提供商数据", "zh-Hant": "暫無代理提供商資料", "fa": "داده‌ای برای ارائه‌دهندگان پروکسی موجود نیست", "ru": "Нет данных о провайдерах прокси" },
   "Speed test": { "zh-Hans": "测速", "zh-Hant": "測速", "fa": "تست سرعت", "ru": "Проверка скорости" },
   "IPv6 test": { "zh-Hans": "IPv6 测试", "zh-Hant": "IPv6 測試", "fa": "تست IPv6", "ru": "Проверка IPv6" },
   "Node test URL": { "zh-Hans": "节点测速地址", "zh-Hant": "節點測速位址", "fa": "نشانی تست گره", "ru": "URL проверки узла" },

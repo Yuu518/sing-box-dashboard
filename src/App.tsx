@@ -756,7 +756,7 @@ function ShellContent(props: ShellProps & { onRetry: () => void }) {
   const reachable = serviceStatus.phase === "active";
   const serverInfo = useUnaryOnce(() => api.serverInfo(), reachable);
   const capabilities = useMemo(
-    () => makeCapabilities(serverInfo?.apiVersion ?? null),
+    () => makeCapabilities(serverInfo?.apiVersion ?? null, serverInfo?.proxyProvidersSupported ?? false),
     [serverInfo],
   );
 
@@ -971,7 +971,7 @@ function ShellContent(props: ShellProps & { onRetry: () => void }) {
             {started ? (
               <>
                 {navItem("overview", t("Overview"), "dashboard", route.page === "overview")}
-                {hasGroups && navItem("groups", t("Groups"), "folder", route.page === "groups")}
+                {hasGroups && navItem("groups", t("Proxies"), "folder", route.page === "groups")}
                 {navItem("connections", t("Connections"), "swap_vert", route.page === "connections")}
               </>
             ) : (
@@ -986,7 +986,7 @@ function ShellContent(props: ShellProps & { onRetry: () => void }) {
               {serverInfo && <span className={styles.sidebarBrandVersion}>{serverInfo.version}</span>}
             </div>
             {navItem("overview", t("Overview"), "dashboard", route.page === "overview")}
-            {hasGroups && navItem("groups", t("Groups"), "folder", route.page === "groups")}
+            {hasGroups && navItem("groups", t("Proxies"), "folder", route.page === "groups")}
             {started && navItem("connections", t("Connections"), "swap_vert", route.page === "connections")}
             {mainPages}
             <ServerPicker

@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { proxyDisplayDescription, proxyDisplayType, urlTestDelayTone, type DelayTone } from "../api/format";
 import { useStream } from "../api/stream";
+import { useSupportsCapability } from "../app/capabilities";
 import { useApi } from "../app/context";
 import { showError } from "../app/errorStore";
 import { usePendingValue } from "../app/hooks";
@@ -10,7 +11,7 @@ import { useURLTestPreferences } from "../app/useURLTestPreferences";
 import { Icon } from "../components/Icon";
 import { PageHeader } from "../components/PageHeader";
 import { StreamStates } from "../components/StreamBanner";
-import { Badge, Card, IconButton, MenuItem, Spinner, useContextMenu } from "../components/ui";
+import { Badge, Card, EmptyState, IconButton, MenuItem, Spinner, useContextMenu } from "../components/ui";
 import type { Group, GroupItem } from "../gen/daemon/started_service_pb";
 import styles from "./GroupsView.module.css";
 import { cx } from "../lib/cx";
@@ -19,20 +20,48 @@ export function GroupsView() {
   const api = useApi();
   const { t } = useI18n();
   const groups = useStream(api.groups);
+  const [activeTab, setActiveTab] = useState<"proxies" | "providers">("proxies");
+  const supportsProviders = useSupportsCapability("proxyProviders");
+  const showingProviders = supportsProviders && activeTab === "providers";
 
   return (
     <div className="page">
       <PageHeader title={t("Groups")} />
-      <StreamStates
-        snapshot={groups}
-        loaded={groups.data.loaded}
-        empty={groups.data.groups.length === 0}
-        emptyIcon="folder"
-        emptyMessage={t("Empty groups")}
-      />
-      {groups.data.groups.map((group) => (
-        <GroupCard key={group.tag} group={group} />
-      ))}
+      {supportsProviders && (
+        <div className={cx("segmented", styles.groupTabs)} role="group" aria-label={t("Groups")}>
+          <button
+            type="button"
+            className={!showingProviders ? "active" : ""}
+            aria-pressed={!showingProviders}
+            onClick={() => setActiveTab("proxies")}
+          >
+            {t("Proxies")}{groups.data.loaded ? ` (${groups.data.groups.length})` : ""}
+          </button>
+          <button
+            type="button"
+            className={showingProviders ? "active" : ""}
+            aria-pressed={showingProviders}
+            onClick={() => setActiveTab("providers")}
+          >
+            {t("Proxy providers")}
+          </button>
+        </div>
+      )}
+      <div hidden={showingProviders}>
+        <StreamStates
+          snapshot={groups}
+          loaded={groups.data.loaded}
+          empty={groups.data.groups.length === 0}
+          emptyIcon="folder"
+          emptyMessage={t("Empty groups")}
+        />
+        {groups.data.groups.map((group) => (
+          <GroupCard key={group.tag} group={group} />
+        ))}
+      </div>
+      {showingProviders && (
+        <EmptyState icon="folder">{t("No proxy provider data")}</EmptyState>
+      )}
     </div>
   );
 }
