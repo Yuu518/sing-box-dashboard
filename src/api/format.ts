@@ -1,3 +1,5 @@
+import { DEFAULT_URL_TEST_PREFERENCES, type URLTestPreferences } from "../app/urlTestPreferences";
+
 export function isHttpUrl(value: string): boolean {
   return /^https?:\/\//i.test(value);
 }
@@ -124,14 +126,17 @@ export function formatRelativeTime(timestampMs: number, nowMs: number, locale?: 
 
 export type DelayTone = "neutral" | "good" | "medium" | "bad";
 
-export function urlTestDelayTone(delay: number): DelayTone {
+export function urlTestDelayTone(
+  delay: number,
+  thresholds: Pick<URLTestPreferences, "yellowThresholdMs" | "redThresholdMs"> = DEFAULT_URL_TEST_PREFERENCES,
+): DelayTone {
   if (delay <= 0) {
     return "neutral";
   }
-  if (delay < 800) {
+  if (delay < thresholds.yellowThresholdMs) {
     return "good";
   }
-  if (delay < 1500) {
+  if (delay < thresholds.redThresholdMs) {
     return "medium";
   }
   return "bad";

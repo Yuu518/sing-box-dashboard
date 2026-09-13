@@ -89,6 +89,7 @@ import {
   AppSettingsView,
   CoreView,
   PreferencesView,
+  URLTestPreferencesView,
   ServersView,
   SettingsView,
   TerminalConfigurationView,
@@ -134,6 +135,7 @@ export type Route =
   | { page: "settings/app" }
   | { page: "settings/core" }
   | { page: "settings/preferences" }
+  | { page: "settings/preferences/url-test" }
   | { page: "settings/preferences/terminal" }
   | { page: "settings/preferences/terminal/theme"; scheme: "light" | "dark" }
   | { page: "settings/preferences/terminal/custom"; scheme: "light" | "dark" }
@@ -253,6 +255,9 @@ function routeFromHash(locationHash: string): Route {
         case "core":
           return { page: "settings/core" };
         case "preferences":
+          if (segments[2] === "url-test") {
+            return { page: "settings/preferences/url-test" };
+          }
           if (segments[2] === "terminal") {
             if (segments[3] === "theme" && (segments[4] === "light" || segments[4] === "dark")) {
               return { page: "settings/preferences/terminal/theme", scheme: segments[4] };
@@ -356,6 +361,8 @@ function routeTitle(route: Route, t: Translate, language: string): string {
       return t("Core");
     case "settings/preferences":
       return t("Preferences");
+    case "settings/preferences/url-test":
+      return t("Speed test");
     case "settings/preferences/terminal":
       return t("Terminal Configuration");
     case "settings/preferences/terminal/theme":
@@ -918,6 +925,7 @@ function ShellContent(props: ShellProps & { onRetry: () => void }) {
         />
       )}
       {route.page === "settings/preferences/terminal" && <TerminalConfigurationView />}
+      {route.page === "settings/preferences/url-test" && <URLTestPreferencesView />}
       {route.page === "settings/preferences/terminal/theme" && (
         <TerminalThemePickerView scheme={route.scheme} />
       )}

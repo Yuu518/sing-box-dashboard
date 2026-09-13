@@ -12,6 +12,14 @@ export const LANGUAGES: { value: Language; label: string }[] = [
 ];
 
 export const TRANSLATIONS = {
+  "Speed test": { "zh-Hans": "测速", "zh-Hant": "測速", "fa": "تست سرعت", "ru": "Проверка скорости" },
+  "Node test URL": { "zh-Hans": "节点测速地址", "zh-Hant": "節點測速位址", "fa": "نشانی تست گره", "ru": "URL проверки узла" },
+  "Test timeout (ms)": { "zh-Hans": "测速超时（毫秒）", "zh-Hant": "測速逾時（毫秒）", "fa": "مهلت تست (میلی‌ثانیه)", "ru": "Тайм-аут проверки (мс)" },
+  "Red threshold (ms)": { "zh-Hans": "红色阈值（毫秒）", "zh-Hant": "紅色閾值（毫秒）", "fa": "آستانه قرمز (میلی‌ثانیه)", "ru": "Красный порог (мс)" },
+  "Yellow threshold (ms)": { "zh-Hans": "黄色阈值（毫秒）", "zh-Hant": "黃色閾值（毫秒）", "fa": "آستانه زرد (میلی‌ثانیه)", "ru": "Жёлтый порог (мс)" },
+  "Enter a valid HTTP or HTTPS test URL.": { "zh-Hans": "请输入有效的 HTTP 或 HTTPS 测速地址。", "zh-Hant": "請輸入有效的 HTTP 或 HTTPS 測速位址。", "fa": "یک نشانی معتبر HTTP یا HTTPS برای تست وارد کنید.", "ru": "Введите корректный HTTP- или HTTPS-адрес для проверки." },
+  "The red threshold must be greater than the yellow threshold.": { "zh-Hans": "红色阈值必须大于黄色阈值。", "zh-Hant": "紅色閾值必須大於黃色閾值。", "fa": "آستانه قرمز باید بزرگ‌تر از آستانه زرد باشد.", "ru": "Красный порог должен быть больше жёлтого." },
+  "Saved": { "zh-Hans": "已保存", "zh-Hant": "已儲存", "fa": "ذخیره شد", "ru": "Сохранено" },
   "Overview": { "zh-Hans": "概述", "zh-Hant": "概述", "fa": "نمای کلی", "ru": "Обзор" },
   "Groups": { "zh-Hans": "代理组", "zh-Hant": "代理組", "fa": "گروه‌ها", "ru": "Группы" },
   "Connections": { "zh-Hans": "连接", "zh-Hant": "連接", "fa": "اتصال‌ها", "ru": "Подключения" },

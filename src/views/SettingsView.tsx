@@ -19,6 +19,13 @@ import {
   saveDisableDeprecatedWarnings,
 } from "../app/deprecatedWarnings";
 import { showError } from "../app/errorStore";
+import {
+  DEFAULT_URL_TEST_PREFERENCES,
+  MAX_URL_TEST_MS,
+  isValidURLTestUrl,
+  loadURLTestPreferences,
+  saveURLTestPreferences,
+} from "../app/urlTestPreferences";
 import { ServiceStatus_Type } from "../gen/daemon/started_service_pb";
 import { LanguageSelect, useI18n } from "../app/i18n";
 import { Icon } from "../components/Icon";
@@ -283,6 +290,9 @@ function AppSettingsContent({
               )}
             </div>
             <UpdateSettingsSection host={host} />
+            <div className="nav-list">
+              <NavRow icon="speed" title={t("Speed test")} onClick={() => navigate("settings/preferences/url-test")} />
+            </div>
             <div>
               <div className="list-section-title">Tailscale</div>
               <div className="nav-list">
@@ -709,6 +719,9 @@ export function PreferencesView(props: {
             <LanguageSelect />
           </div>
         </div>
+        <div className="nav-list">
+          <NavRow icon="speed" title={t("Speed test")} onClick={() => navigate("settings/preferences/url-test")} />
+        </div>
         <div>
           <div className="list-section-title">Tailscale</div>
           <div className="nav-list">
@@ -720,6 +733,105 @@ export function PreferencesView(props: {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+export function URLTestPreferencesView() {
+  const { t } = useI18n();
+  const host = useDesktopHost();
+  const [initial] = useState(loadURLTestPreferences);
+  const [url, setUrl] = useState(initial.url);
+  const [numbers, setNumbers] = useState({
+    timeoutMs: String(initial.timeoutMs),
+    redThresholdMs: String(initial.redThresholdMs),
+    yellowThresholdMs: String(initial.yellowThresholdMs),
+  });
+  const [error, setError] = useState("");
+  const [saved, setSaved] = useState(false);
+  const numberFields = [
+    { key: "timeoutMs", label: t("Test timeout (ms)") },
+    { key: "redThresholdMs", label: t("Red threshold (ms)") },
+    { key: "yellowThresholdMs", label: t("Yellow threshold (ms)") },
+  ] as const;
+
+  const clearFeedback = () => {
+    setError("");
+    setSaved(false);
+  };
+
+  return (
+    <div className="page">
+      <SettingsPageHeader
+        title={t("Speed test")}
+        back={host !== null ? "settings/app" : "settings/preferences"}
+        backLabel={host !== null ? t("App") : t("Preferences")}
+      />
+      <form
+        className="card settings-stack"
+        onSubmit={(event) => {
+          event.preventDefault();
+          const next = {
+            url: url.trim() || DEFAULT_URL_TEST_PREFERENCES.url,
+            timeoutMs: Number(numbers.timeoutMs || DEFAULT_URL_TEST_PREFERENCES.timeoutMs),
+            redThresholdMs: Number(numbers.redThresholdMs || DEFAULT_URL_TEST_PREFERENCES.redThresholdMs),
+            yellowThresholdMs: Number(numbers.yellowThresholdMs || DEFAULT_URL_TEST_PREFERENCES.yellowThresholdMs),
+          };
+          if (!isValidURLTestUrl(next.url)) {
+            setError(t("Enter a valid HTTP or HTTPS test URL."));
+            return;
+          }
+          if (next.yellowThresholdMs >= next.redThresholdMs) {
+            setError(t("The red threshold must be greater than the yellow threshold."));
+            return;
+          }
+          try {
+            saveURLTestPreferences(next);
+            setUrl(next.url);
+            setNumbers({ timeoutMs: String(next.timeoutMs), redThresholdMs: String(next.redThresholdMs), yellowThresholdMs: String(next.yellowThresholdMs) });
+            setError("");
+            setSaved(true);
+          } catch (error) {
+            showError(error);
+          }
+        }}
+      >
+        <Field label={t("Node test URL")}>
+          <input
+            className="input"
+            type="url"
+            value={url}
+            onChange={(event) => { setUrl(event.target.value); clearFeedback(); }}
+            onBlur={() => { if (url.trim() === "") setUrl(DEFAULT_URL_TEST_PREFERENCES.url); }}
+          />
+        </Field>
+        {numberFields.map(({ key, label }) => (
+          <Field key={key} label={label}>
+            <input
+              className="input"
+              type="number"
+              min={1}
+              max={MAX_URL_TEST_MS}
+              step={1}
+              value={numbers[key]}
+              onChange={(event) => {
+                setNumbers({ ...numbers, [key]: event.target.value });
+                clearFeedback();
+              }}
+              onBlur={() => {
+                if (numbers[key] === "") {
+                  setNumbers({ ...numbers, [key]: String(DEFAULT_URL_TEST_PREFERENCES[key]) });
+                }
+              }}
+            />
+          </Field>
+        ))}
+        {error !== "" && <div className={styles.fieldError} role="alert">{error}</div>}
+        <div>
+          <Button type="submit" variant="primary">{t("Save")}</Button>
+        </div>
+        {saved && <div role="status">{t("Saved")}</div>}
+      </form>
     </div>
   );
 }

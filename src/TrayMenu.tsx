@@ -16,6 +16,7 @@ import { useDaemonConnection, useDesktopProfiles } from "./app/desktop";
 import type { DesktopHost } from "./app/desktop";
 import { dismissError, showError, useCurrentError } from "./app/errorStore";
 import { I18nProvider, useI18n } from "./app/i18n";
+import { useURLTestPreferences } from "./app/useURLTestPreferences";
 import { Icon } from "./components/Icon";
 import { Spinner, Switch } from "./components/ui";
 import { ServiceStatus_Type } from "./gen/daemon/started_service_pb";
@@ -501,6 +502,7 @@ function GroupsSubmenu(props: {
 }
 
 function GroupNodes(props: { group: Group; api: DaemonApi; onClose: () => void }) {
+  const preferences = useURLTestPreferences();
   const { t } = useI18n();
   const group = props.group;
   const [testing, setTesting] = useState(false);
@@ -560,7 +562,7 @@ function GroupNodes(props: { group: Group; api: DaemonApi; onClose: () => void }
             </span>
             <span className={styles.rowLabel}>{item.tag}</span>
             {item.urlTestDelay > 0 && (
-              <span className={cx(styles.delay, styles[urlTestDelayTone(item.urlTestDelay)])}>
+              <span className={cx(styles.delay, styles[urlTestDelayTone(item.urlTestDelay, preferences)])}>
                 {item.urlTestDelay}ms
               </span>
             )}

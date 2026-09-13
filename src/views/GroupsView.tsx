@@ -1,11 +1,12 @@
 import { useState } from "react";
 
-import { proxyDisplayType, urlTestDelayTone } from "../api/format";
+import { proxyDisplayType, urlTestDelayTone, type DelayTone } from "../api/format";
 import { useStream } from "../api/stream";
 import { useApi } from "../app/context";
 import { showError } from "../app/errorStore";
 import { usePendingValue } from "../app/hooks";
 import { useI18n } from "../app/i18n";
+import { useURLTestPreferences } from "../app/useURLTestPreferences";
 import { Icon } from "../components/Icon";
 import { PageHeader } from "../components/PageHeader";
 import { StreamStates } from "../components/StreamBanner";
@@ -37,6 +38,7 @@ export function GroupsView() {
 }
 
 function GroupCard(props: { group: Group }) {
+  const preferences = useURLTestPreferences();
   const api = useApi();
   const { t } = useI18n();
   const group = props.group;
@@ -120,6 +122,7 @@ function GroupCard(props: { group: Group }) {
                 key={item.tag}
                 item={item}
                 selected={item.tag === selected}
+                tone={urlTestDelayTone(item.urlTestDelay, preferences)}
                 onSelect={() => selectItem(item)}
               />
             ))}
@@ -127,7 +130,7 @@ function GroupCard(props: { group: Group }) {
         ) : (
           <div className={styles.groupDots}>
             {group.items.map((item) => {
-              const tone = item.urlTestDelay > 0 ? urlTestDelayTone(item.urlTestDelay) : "";
+              const tone = item.urlTestDelay > 0 ? urlTestDelayTone(item.urlTestDelay, preferences) : "";
               return (
                 <button
                   type="button"
@@ -151,7 +154,7 @@ function GroupCard(props: { group: Group }) {
   );
 }
 
-function GroupItemCard(props: { item: GroupItem; selected: boolean; onSelect: () => void }) {
+function GroupItemCard(props: { item: GroupItem; selected: boolean; tone: DelayTone; onSelect: () => void }) {
   const api = useApi();
   const { t } = useI18n();
   const item = props.item;
@@ -173,7 +176,7 @@ function GroupItemCard(props: { item: GroupItem; selected: boolean; onSelect: ()
         <span className={styles.itemMeta}>
           <span>{proxyDisplayType(item.type)}</span>
           {item.urlTestDelay > 0 && (
-            <span className={cx(styles.delayText, styles[urlTestDelayTone(item.urlTestDelay)])}>
+            <span className={cx(styles.delayText, styles[props.tone])}>
               {item.urlTestDelay}ms
             </span>
           )}
