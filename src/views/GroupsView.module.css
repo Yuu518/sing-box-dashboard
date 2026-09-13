@@ -38,6 +38,7 @@
 }
 
 .group-item {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -66,6 +67,19 @@
   composes: text-headline from global;
 }
 
+.item-select {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: inherit;
+}
+
+.item-tag, .item-meta {
+  pointer-events: none;
+}
+
 .group-item .item-tag {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -82,8 +96,23 @@
 }
 
 .delay-text {
+  position: relative;
+  padding: 0;
+  font: inherit;
   font-weight: var(--weight-semibold);
   font-variant-numeric: tabular-nums;
+  pointer-events: auto;
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+
+.delay-text:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.delay-text:disabled {
+  cursor: default;
 }
 
 .delay-text.good {

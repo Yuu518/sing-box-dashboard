@@ -158,30 +158,54 @@ function GroupItemCard(props: { item: GroupItem; selected: boolean; tone: DelayT
   const api = useApi();
   const { t } = useI18n();
   const item = props.item;
+  const [testing, setTesting] = useState(false);
+  const runURLTest = () => {
+    if (testing) {
+      return;
+    }
+    setTesting(true);
+    api.urlTest(item.tag).catch(showError).finally(() => setTesting(false));
+  };
   const menu = useContextMenu(
-    <MenuItem icon="speed" onSelect={() => api.urlTest(item.tag).catch(showError)}>
+    <MenuItem icon="speed" onSelect={runURLTest}>
       {t("URL test")}
     </MenuItem>,
   );
 
   return (
     <>
-      <button
-        type="button"
+      <div
         className={cx(styles.groupItem, props.selected && styles.selected)}
-        onClick={props.onSelect}
+        onClick={(event) => event.stopPropagation()}
         {...menu.triggerProps}
       >
+        <button
+          type="button"
+          className={styles.itemSelect}
+          aria-label={item.tag}
+          aria-pressed={props.selected}
+          onClick={props.onSelect}
+        />
         <span className={styles.itemTag}>{item.tag}</span>
         <span className={styles.itemMeta}>
           <span>{proxyDisplayType(item.type)}</span>
           {item.urlTestDelay > 0 && (
-            <span className={cx(styles.delayText, styles[props.tone])}>
-              {item.urlTestDelay}ms
-            </span>
+            <button
+              type="button"
+              className={cx(styles.delayText, styles[props.tone])}
+              title={`${t("URL test")}: ${item.tag}`}
+              aria-label={`${t("URL test")}: ${item.tag}`}
+              disabled={testing}
+              onClick={(event) => {
+                event.stopPropagation();
+                runURLTest();
+              }}
+            >
+              {testing ? <Spinner /> : `${item.urlTestDelay}ms`}
+            </button>
           )}
         </span>
-      </button>
+      </div>
       {menu.element}
     </>
   );
