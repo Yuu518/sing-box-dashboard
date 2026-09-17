@@ -12,6 +12,10 @@ export const LANGUAGES: { value: Language; label: string }[] = [
 ];
 
 export const TRANSLATIONS = {
+  "Rule sets": { "zh-Hans": "规则集", "zh-Hant": "規則集", "fa": "مجموعه قوانین", "ru": "Наборы правил" },
+  "No rule sets": { "zh-Hans": "暂无规则集", "zh-Hant": "暫無規則集", "fa": "مجموعه قوانینی وجود ندارد", "ru": "Нет наборов правил" },
+  "Update all rule sets": { "zh-Hans": "更新所有规则集", "zh-Hant": "更新所有規則集", "fa": "به‌روزرسانی همه مجموعه قوانین", "ru": "Обновить все наборы правил" },
+  "{count} rules": { "zh-Hans": "{count} 条规则", "zh-Hant": "{count} 條規則", "fa": "{count} قانون", "ru": "Правил: {count}" },
   "Update all subscriptions": { "zh-Hans": "更新所有订阅", "zh-Hant": "更新所有訂閱", "fa": "به‌روزرسانی همه اشتراک‌ها", "ru": "Обновить все подписки" },
   "{count} nodes ({tested} tested)": { "zh-Hans": "{count} 个节点 ({tested} 已测试)", "zh-Hant": "{count} 個節點 ({tested} 已測試)", "fa": "{count} گره ({tested} تست‌شده)", "ru": "{count} узлов (проверено: {tested})" },
   "Updated {time}": { "zh-Hans": "更新于 {time}", "zh-Hant": "更新於 {time}", "fa": "به‌روزرسانی {time}", "ru": "Обновлено {time}" },

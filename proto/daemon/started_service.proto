@@ -32,6 +32,8 @@ service StartedService {
   rpc SubscribeProxyProviders(google.protobuf.Empty) returns (stream ProxyProviderList) {}
   rpc UpdateProxyProvider(ProxyProviderRequest) returns (google.protobuf.Empty) {}
   rpc HealthCheckProxyProvider(ProxyProviderHealthCheckRequest) returns (google.protobuf.Empty) {}
+  rpc SubscribeRuleProviders(google.protobuf.Empty) returns (stream RuleProviderList) {}
+  rpc UpdateRuleProvider(RuleProviderRequest) returns (google.protobuf.Empty) {}
   rpc StartNetworkQualityTest(NetworkQualityTestRequest) returns (stream NetworkQualityTestProgress) {}
   rpc StartSTUNTest(STUNTestRequest) returns (stream STUNTestProgress) {}
   rpc SubscribeTailscaleStatus(google.protobuf.Empty) returns (stream TailscaleStatusUpdate) {}
@@ -61,6 +63,7 @@ message Version {
   string version = 1;
   int32 apiVersion = 2;
   bool proxyProvidersSupported = 3;
+  bool ruleProvidersSupported = 4;
 }
 
 message ServiceStatus {
@@ -134,16 +137,12 @@ message GroupItem {
   int32 urlTestDelay = 4;
   bool udp = 5;
   bool xudp = 6;
-  // Most recent IPv6-only probe; false on failure or when untested.
-  // Groups report the currently selected underlying node.
   bool ipv6 = 7;
 }
 
 message URLTestRequest {
   string outboundTag = 1;
-  // Independent from latency; a failed probe clears a prior positive result.
   bool ipv6Test = 2;
-  // Empty URL and zero timeout preserve server defaults.
   string url = 3;
   int32 timeoutMs = 4;
 }
@@ -155,7 +154,7 @@ message ProxyProviderList {
 message ProxyProvider {
   string tag = 1;
   string type = 2;
-  int64 updatedAt = 3; // Unix milliseconds; zero when unavailable.
+  int64 updatedAt = 3;
   repeated GroupItem outbounds = 4;
   bool updatable = 5;
   ProxyProviderSubscription subscription = 6;
@@ -165,10 +164,27 @@ message ProxyProviderSubscription {
   int64 upload = 1;
   int64 download = 2;
   int64 total = 3;
-  int64 expire = 4; // Unix seconds; zero when unavailable.
+  int64 expire = 4;
 }
 
 message ProxyProviderRequest {
+  string tag = 1;
+}
+
+message RuleProviderList {
+  repeated RuleProvider providers = 1;
+}
+
+message RuleProvider {
+  string tag = 1;
+  string type = 2;
+  string format = 3;
+  uint64 ruleCount = 4;
+  int64 updatedAt = 5;
+  bool updatable = 6;
+}
+
+message RuleProviderRequest {
   string tag = 1;
 }
 

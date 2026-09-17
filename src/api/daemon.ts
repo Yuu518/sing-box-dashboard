@@ -12,6 +12,7 @@ import {
   Group,
   GroupItem,
   type ProxyProvider,
+  type RuleProvider,
   LogLevel,
   ServiceStatus,
   ServiceStatus_Type,
@@ -51,6 +52,11 @@ export interface GroupsData {
 
 export interface ProxyProvidersData {
   providers: ProxyProvider[];
+  loaded: boolean;
+}
+
+export interface RuleProvidersData {
+  providers: RuleProvider[];
   loaded: boolean;
 }
 
@@ -114,6 +120,7 @@ export interface ServerInfo {
   version: string;
   apiVersion: number;
   proxyProvidersSupported: boolean;
+  ruleProvidersSupported: boolean;
 }
 
 const SUBSCRIPTION_INTERVAL = 1_000_000_000n;
@@ -128,6 +135,7 @@ export class DaemonApi {
   readonly status: StreamStore<StatusData>;
   readonly groups: StreamStore<GroupsData>;
   readonly proxyProviders: StreamStore<ProxyProvidersData>;
+  readonly ruleProviders: StreamStore<RuleProvidersData>;
   readonly clashMode: StreamStore<ClashModeData>;
   readonly logs: StreamStore<LogsData>;
   readonly connections: StreamStore<ConnectionsData>;
@@ -202,6 +210,20 @@ export class DaemonApi {
           throw new ConnectError("proxy providers are not supported by this server", Code.Unimplemented);
         }
         for await (const message of this.client.subscribeProxyProviders({}, { signal })) {
+          update(() => ({ providers: message.providers, loaded: true }));
+        }
+      },
+      true,
+    );
+
+    this.ruleProviders = new StreamStore<RuleProvidersData>(
+      () => ({ providers: [], loaded: false }),
+      async ({ signal, update }) => {
+        const info = await this.serverInfo();
+        if (!info.ruleProvidersSupported) {
+          throw new ConnectError("rule providers are not supported by this server", Code.Unimplemented);
+        }
+        for await (const message of this.client.subscribeRuleProviders({}, { signal })) {
           update(() => ({ providers: message.providers, loaded: true }));
         }
       },
@@ -419,6 +441,7 @@ export class DaemonApi {
     this.status.retryNow();
     this.groups.retryNow();
     this.proxyProviders.retryNow();
+    this.ruleProviders.retryNow();
     this.clashMode.retryNow();
     this.logs.retryNow();
     this.connections.retryNow();
@@ -434,6 +457,7 @@ export class DaemonApi {
     this.status.reconnectNow();
     this.groups.reconnectNow();
     this.proxyProviders.reconnectNow();
+    this.ruleProviders.reconnectNow();
     this.clashMode.reconnectNow();
     this.logs.reconnectNow();
     this.connections.reconnectNow();
@@ -449,6 +473,10 @@ export class DaemonApi {
 
   async updateProxyProvider(tag: string): Promise<void> {
     await this.client.updateProxyProvider({ tag });
+  }
+
+  async updateRuleProvider(tag: string): Promise<void> {
+    await this.client.updateRuleProvider({ tag });
   }
 
   async healthCheckProxyProvider(tag: string): Promise<void> {
@@ -487,6 +515,7 @@ export class DaemonApi {
         version: response.version,
         apiVersion: response.apiVersion,
         proxyProvidersSupported: response.proxyProvidersSupported,
+        ruleProvidersSupported: response.ruleProvidersSupported,
       };
     }
     return this.versionCache;
