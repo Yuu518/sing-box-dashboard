@@ -60,7 +60,7 @@ import {
   CrashReportListView,
 } from "./views/CrashReportsView";
 import { GroupsView } from "./views/GroupsView";
-import { RuleProvidersView } from "./views/RuleProvidersView";
+import { RulesView } from "./views/RulesView";
 import { LogsView } from "./views/LogsView";
 import {
   OOMReportDetailView,
@@ -112,7 +112,7 @@ import { cx } from "./lib/cx";
 export type Route =
   | { page: "overview" }
   | { page: "groups" }
-  | { page: "rule-providers" }
+  | { page: "rules" }
   | { page: "connections" }
   | { page: "logs" }
   | { page: "tools" }
@@ -170,7 +170,8 @@ function routeFromHash(locationHash: string): Route {
     case "groups":
       return { page: "groups" };
     case "rule-providers":
-      return { page: "rule-providers" };
+    case "rules":
+      return { page: "rules" };
     case "connections":
       return { page: "connections" };
     case "logs":
@@ -317,8 +318,8 @@ function routeTitle(route: Route, t: Translate, language: string): string {
       return t("Dashboard");
     case "groups":
       return t("Groups");
-    case "rule-providers":
-      return t("Rule sets");
+    case "rules":
+      return t("Rules");
     case "connections":
       return t("Connections");
     case "logs":
@@ -762,7 +763,7 @@ function ShellContent(props: ShellProps & { onRetry: () => void }) {
   const reachable = serviceStatus.phase === "active";
   const serverInfo = useUnaryOnce(() => api.serverInfo(), reachable);
   const capabilities = useMemo(
-    () => makeCapabilities(serverInfo?.apiVersion ?? null, serverInfo?.proxyProvidersSupported ?? false, serverInfo?.ruleProvidersSupported ?? false),
+    () => makeCapabilities(serverInfo?.apiVersion ?? null, serverInfo?.proxyProvidersSupported ?? false, serverInfo?.ruleProvidersSupported ?? false, serverInfo?.rulesSupported ?? false),
     [serverInfo],
   );
 
@@ -781,7 +782,7 @@ function ShellContent(props: ShellProps & { onRetry: () => void }) {
     }
     const invisible =
       (route.page === "groups" && (!started || (groupsKnown && !hasGroups))) ||
-      (route.page === "rule-providers" && (!started || (capabilities.ready && !capabilities.supports("ruleProviders")))) ||
+      (route.page === "rules" && (!started || (capabilities.ready && !(capabilities.supports("rules") || capabilities.supports("ruleProviders"))))) ||
       (route.page === "connections" && !started) ||
       (isStartedOnlyToolsSubpage(route.page) && !started) ||
       (route.page === "tools/usbip" && capabilities.ready && !capabilities.supports("usbip")) ||
@@ -867,7 +868,7 @@ function ShellContent(props: ShellProps & { onRetry: () => void }) {
   const mainPages = (
     <>
       {navItem("logs", t("Logs"), "text_snippet", route.page === "logs")}
-      {started && capabilities.supports("ruleProviders") && navItem("rule-providers", t("Rule sets"), "folder", route.page === "rule-providers")}
+      {started && (capabilities.supports("rules") || capabilities.supports("ruleProviders")) && navItem("rules", t("Rules"), "folder", route.page === "rules")}
       {navItem(
         "tools",
         t("Tools"),
@@ -883,7 +884,7 @@ function ShellContent(props: ShellProps & { onRetry: () => void }) {
     <main className={styles.content}>
       {route.page === "overview" && <OverviewView />}
       {route.page === "groups" && <GroupsView />}
-      {route.page === "rule-providers" && started && capabilities.supports("ruleProviders") && <RuleProvidersView />}
+      {route.page === "rules" && started && (capabilities.supports("rules") || capabilities.supports("ruleProviders")) && <RulesView />}
       {route.page === "connections" && <ConnectionsView />}
       {route.page === "logs" && <LogsView />}
       {route.page === "tools" && <ToolsView />}

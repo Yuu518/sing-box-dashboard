@@ -28,7 +28,7 @@ it("sends provider operations and current probe preferences", async () => {
 
 it("does not subscribe on unsupported servers", async () => {
   const daemon = api();
-  vi.spyOn(daemon, "serverInfo").mockResolvedValue({ version: "old", apiVersion: 4, proxyProvidersSupported: false, ruleProvidersSupported: false });
+  vi.spyOn(daemon, "serverInfo").mockResolvedValue({ version: "old", apiVersion: 4, proxyProvidersSupported: false, ruleProvidersSupported: false, rulesSupported: false });
   const subscribe = vi.spyOn(daemon.client, "subscribeProxyProviders");
   const stop = daemon.proxyProviders.subscribe(() => {});
   try {
@@ -41,7 +41,7 @@ it("does not subscribe on unsupported servers", async () => {
 
 it("publishes provider snapshots and cancels the stream when the view closes", async () => {
   const daemon = api();
-  vi.spyOn(daemon, "serverInfo").mockResolvedValue({ version: "new", apiVersion: 5, proxyProvidersSupported: true, ruleProvidersSupported: false });
+  vi.spyOn(daemon, "serverInfo").mockResolvedValue({ version: "new", apiVersion: 5, proxyProvidersSupported: true, ruleProvidersSupported: false, rulesSupported: false });
   let signal: AbortSignal | undefined;
   vi.spyOn(daemon.client, "subscribeProxyProviders").mockImplementation(async function* (_, options) {
     signal = options?.signal;

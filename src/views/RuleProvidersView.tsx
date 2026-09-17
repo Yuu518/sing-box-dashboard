@@ -6,15 +6,13 @@ import { useApi, useNow } from "../app/context";
 import { showError } from "../app/errorStore";
 import { useI18n } from "../app/i18n";
 import { Icon } from "../components/Icon";
-import { PageHeader } from "../components/PageHeader";
 import { StreamStates } from "../components/StreamBanner";
 import { Card, IconButton, Spinner } from "../components/ui";
 import type { RuleProvider } from "../gen/daemon/started_service_pb";
 import styles from "./RuleProvidersView.module.css";
 
-export function RuleProvidersView() {
+export function useRuleProviders() {
   const api = useApi();
-  const { t } = useI18n();
   const snapshot = useStream(api.ruleProviders);
   const pendingRef = useRef(new Set<string>());
   const [pending, setPending] = useState(new Set<string>());
@@ -37,22 +35,30 @@ export function RuleProvidersView() {
       if (all) setUpdatingAll(false);
     }
   };
+  return { snapshot, pending, updatingAll, update };
+}
+
+export function RuleProvidersRefreshButton({ state }: { state: ReturnType<typeof useRuleProviders> }) {
+  const { t } = useI18n();
+  const { snapshot, pending, updatingAll, update } = state;
   return (
-    <div className="page">
-      <PageHeader
-        title={t("Rule sets")}
-        actions={
-          <IconButton
-            title={t("Update all rule sets")}
-            aria-label={t("Update all rule sets")}
-            aria-busy={updatingAll}
-            disabled={pending.size > 0 || !snapshot.data.loaded || !snapshot.data.providers.some((provider) => provider.updatable)}
-            onClick={() => void update(snapshot.data.providers, true)}
-          >
-            {updatingAll ? <Spinner /> : <Icon name="sync" />}
-          </IconButton>
-        }
-      />
+    <IconButton
+      title={t("Update all rule sets")}
+      aria-label={t("Update all rule sets")}
+      aria-busy={updatingAll}
+      disabled={pending.size > 0 || !snapshot.data.loaded || !snapshot.data.providers.some((provider) => provider.updatable)}
+      onClick={() => void update(snapshot.data.providers, true)}
+    >
+      {updatingAll ? <Spinner /> : <Icon name="sync" />}
+    </IconButton>
+  );
+}
+
+export function RuleProvidersView({ state }: { state: ReturnType<typeof useRuleProviders> }) {
+  const { t } = useI18n();
+  const { snapshot, pending, update } = state;
+  return (
+    <>
       <StreamStates
         snapshot={snapshot}
         loaded={snapshot.data.loaded}
@@ -63,7 +69,7 @@ export function RuleProvidersView() {
       {snapshot.data.providers.map((provider) => (
         <RuleProviderCard key={provider.tag} provider={provider} pending={pending.has(provider.tag)} onUpdate={() => void update([provider])} />
       ))}
-    </div>
+    </>
   );
 }
 

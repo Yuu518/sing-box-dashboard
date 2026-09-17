@@ -12,6 +12,9 @@ export const LANGUAGES: { value: Language; label: string }[] = [
 ];
 
 export const TRANSLATIONS = {
+  "Rules": { "zh-Hans": "规则", "zh-Hant": "規則", "fa": "قوانین", "ru": "Правила" },
+  "No rules": { "zh-Hans": "暂无规则", "zh-Hant": "暫無規則", "fa": "قانونی وجود ندارد", "ru": "Нет правил" },
+  "All traffic": { "zh-Hans": "所有流量", "zh-Hant": "所有流量", "fa": "همه ترافیک", "ru": "Весь трафик" },
   "Rule sets": { "zh-Hans": "规则集", "zh-Hant": "規則集", "fa": "مجموعه قوانین", "ru": "Наборы правил" },
   "No rule sets": { "zh-Hans": "暂无规则集", "zh-Hant": "暫無規則集", "fa": "مجموعه قوانینی وجود ندارد", "ru": "Нет наборов правил" },
   "Update all rule sets": { "zh-Hans": "更新所有规则集", "zh-Hant": "更新所有規則集", "fa": "به‌روزرسانی همه مجموعه قوانین", "ru": "Обновить все наборы правил" },

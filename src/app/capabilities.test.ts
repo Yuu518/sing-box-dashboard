@@ -26,4 +26,13 @@ describe("provider capability", () => {
     expect(makeCapabilities(4).supports("taildrop")).toBe(true);
     expect(makeCapabilities(2).supports("usbip")).toBe(true);
   });
+
+  it("keeps routing rules and rule sets independently discoverable", () => {
+    expect(makeCapabilities(999).supports("rules")).toBe(false);
+    expect(makeCapabilities(6, false, true).supports("rules")).toBe(false);
+    expect(makeCapabilities(6, false, true).supports("ruleProviders")).toBe(true);
+    expect(makeCapabilities(7, false, false, true).supports("rules")).toBe(true);
+    expect(makeCapabilities(7, false, false, true).supports("ruleProviders")).toBe(false);
+    expect(makeCapabilities(null, false, false, true).supports("rules")).toBe(false);
+  });
 });

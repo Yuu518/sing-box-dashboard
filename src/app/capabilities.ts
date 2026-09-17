@@ -6,20 +6,21 @@ export const MIN_API_VERSION = {
   taildrop: 4,
 } as const;
 
-export type Capability = keyof typeof MIN_API_VERSION | "proxyProviders" | "ruleProviders";
+export type Capability = keyof typeof MIN_API_VERSION | "proxyProviders" | "ruleProviders" | "rules";
 
 export interface ServerCapabilities {
   ready: boolean;
   supports(capability: Capability): boolean;
 }
 
-export function makeCapabilities(apiVersion: number | null, proxyProvidersSupported = false, ruleProvidersSupported = false): ServerCapabilities {
+export function makeCapabilities(apiVersion: number | null, proxyProvidersSupported = false, ruleProvidersSupported = false, rulesSupported = false): ServerCapabilities {
   return {
     ready: apiVersion !== null,
     supports: (capability) => apiVersion !== null && (
       capability === "proxyProviders" ? proxyProvidersSupported
         : capability === "ruleProviders" ? ruleProvidersSupported
-          : apiVersion >= MIN_API_VERSION[capability]
+          : capability === "rules" ? rulesSupported
+            : apiVersion >= MIN_API_VERSION[capability]
     ),
   };
 }
