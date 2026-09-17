@@ -868,7 +868,7 @@ function ShellContent(props: ShellProps & { onRetry: () => void }) {
   const mainPages = (
     <>
       {navItem("logs", t("Logs"), "text_snippet", route.page === "logs")}
-      {started && (capabilities.supports("rules") || capabilities.supports("ruleProviders")) && navItem("rules", t("Rules"), "folder", route.page === "rules")}
+      {started && (capabilities.supports("rules") || capabilities.supports("ruleProviders")) && navItem("rules", t("Rules"), "swatch_book", route.page === "rules")}
       {navItem(
         "tools",
         t("Tools"),
@@ -981,7 +981,7 @@ function ShellContent(props: ShellProps & { onRetry: () => void }) {
             {started ? (
               <>
                 {navItem("overview", t("Overview"), "dashboard", route.page === "overview")}
-                {hasGroups && navItem("groups", t("Proxies"), "folder", route.page === "groups")}
+                {hasGroups && navItem("groups", t("Proxies"), "globe", route.page === "groups")}
                 {navItem("connections", t("Connections"), "swap_vert", route.page === "connections")}
               </>
             ) : (
@@ -996,7 +996,7 @@ function ShellContent(props: ShellProps & { onRetry: () => void }) {
               {serverInfo && <span className={styles.sidebarBrandVersion}>{serverInfo.version}</span>}
             </div>
             {navItem("overview", t("Overview"), "dashboard", route.page === "overview")}
-            {hasGroups && navItem("groups", t("Proxies"), "folder", route.page === "groups")}
+            {hasGroups && navItem("groups", t("Proxies"), "globe", route.page === "groups")}
             {started && navItem("connections", t("Connections"), "swap_vert", route.page === "connections")}
             {mainPages}
             <ServerPicker
